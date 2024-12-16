@@ -1,0 +1,90 @@
+#include<iostream>
+#include<graphics.h>
+#include<cmath>
+using namespace std;
+
+void drawCirclePoints(int xc, int yc, int x, int y) {
+    putpixel(xc + x,yc + y,BLACK);
+    putpixel(xc - x,yc + y,BLACK);
+    putpixel(xc + x,yc - y,BLACK);
+    putpixel(xc - x,yc - y,BLACK);
+    putpixel(xc + y,yc + x,BLACK);
+    putpixel(xc - y,yc + x,BLACK);
+    putpixel(xc + y,yc - x,BLACK);
+    putpixel(xc - y,yc - x,BLACK);
+}
+
+void drawCircle(int xc, int yc, int r) {
+    int x = 0, y = r;
+    int d = 3 - 2 * r;
+    drawCirclePoints(xc, yc, x, y);    
+    while (y >= x) {
+        x++;
+        if (d > 0) {
+            y--;
+            d = d + 4 * (x - y) + 10;
+        } 
+		else {
+            d = d + 4 * x + 6;
+        }
+        drawCirclePoints(xc, yc, x, y);
+    }
+}
+
+void triangle(int xc,int yc,int R){
+	int b=(sqrt(3)/2)*R;
+	int h=sqrt((R*R)-(b*b));
+	setcolor(BLACK);
+	line(xc,yc-R,xc+b,yc+h);
+	line(xc+b,yc+h,xc-b,yc+h);
+	line(xc-b,yc+h,xc,yc-R);
+}
+
+void polygons(int xc,int yc, int r){
+	int exty=r+(r/5),extx=r+(r*0.9);
+	setcolor(BLACK);
+	rectangle(xc-extx,yc-exty,xc+extx,yc+exty);
+
+	line(xc,yc-exty,xc+extx,yc);
+	line(xc+extx,yc,xc,yc+exty);
+	line(xc,yc+exty,xc-extx,yc);
+	line(xc-extx,yc,xc,yc-exty);
+	
+}
+int main()
+{	
+	int ch,r1;
+
+	while(ch!=3){
+		cout<<"choose which figure to draw\n";
+		cout<<"1.small circle enclosed in a triangle enclosed in big circle\n";
+		cout<<"2.circle enclosed in diamon enclosed in rectangle\n";
+		cout<<"3.exit\n";
+		cin>>ch;
+		cout<<"Enter a radius for circle\n";
+		cin>>r1;
+		
+		int gd = DETECT, gm;
+		initgraph(&gd, &gm, (char*)"");
+		setbkcolor(DARKGRAY);
+	    cleardevice();
+		int xc=getmaxx()/2;
+		int yc=getmaxy()/2;
+		int r2=r1/2; 
+		
+		drawCircle(xc,yc,r1);
+		if(ch==1){
+			triangle(xc,yc,r1);
+			drawCircle(xc,yc,r2);
+		}
+		else if(ch==2){
+			polygons(xc,yc,r1);
+		}
+		else
+			exit(0);
+		
+		getch();
+		closegraph();
+	}
+	return 0;
+}
