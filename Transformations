@@ -1,0 +1,111 @@
+#include <iostream>
+#include <graphics.h>
+#include <cmath>
+using namespace std;
+
+class Point {
+public:
+    int x, y;
+
+    Point() : x(0), y(0) {}  
+    Point(int x, int y) : x(x), y(y) {}  
+
+    Point operator+(const Point& p) {
+        return Point(x + p.x, y + p.y);
+    }
+
+    Point operator*(float scale) {
+        return Point(x * scale, y * scale);
+    }
+
+    Point rotate(float angle, Point origin) {
+        float rad = angle * M_PI / 180.0; 
+        int newX = origin.x + (x - origin.x) * cos(rad) - (y - origin.y) * sin(rad);
+        int newY = origin.y + (x - origin.x) * sin(rad) + (y - origin.y) * cos(rad);
+        return Point(newX, newY);
+    }
+};
+
+class Shape {
+public:
+    Point vertices[4]; 
+    int vertexCount;
+
+    Shape(Point v[], int count) {
+        vertexCount = count;
+        for (int i = 0; i < count; i++) {
+            vertices[i] = v[i];
+        }
+    }
+
+    
+    void draw(int color = BLACK) {
+        setcolor(color);
+        for (int i = 0; i < vertexCount; i++) {
+            int next = (i + 1) % vertexCount;
+            line(vertices[i].x, vertices[i].y, vertices[next].x, vertices[next].y);
+        }
+    }
+
+    Shape operator+(const Point& translation) {
+        Point newVertices[4];
+        for (int i = 0; i < vertexCount; i++) {
+            newVertices[i] = vertices[i] + translation;
+        }
+        return Shape(newVertices, vertexCount);
+    }
+
+    Shape operator*(float scale) {
+        Point newVertices[4];
+        for (int i = 0; i < vertexCount; i++) {
+            newVertices[i] = vertices[i] * scale;
+        }
+        return Shape(newVertices, vertexCount);
+    }
+
+    Shape rotate(float angle, Point origin) {
+        Point newVertices[4];
+        for (int i = 0; i < vertexCount; i++) {
+            newVertices[i] = vertices[i].rotate(angle, origin);
+        }
+        return Shape(newVertices, vertexCount);
+    }
+};
+
+int main() {
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm, (char*)"");
+    setbkcolor(DARKGRAY);
+    cleardevice();
+
+    Point triangleVertices[] = {Point(25, 200), Point(125, 200), Point(75, 100)};
+    Shape triangle(triangleVertices, 3);
+
+    Point rhombusVertices[] = {Point(275, 200), Point(300, 100), Point(400, 100), Point(375, 200)};
+    Shape rhombus(rhombusVertices, 4);
+
+    triangle.draw();
+    rhombus.draw();
+    getch();
+
+    Shape translatedTriangle = triangle + Point(120, 0);
+    Shape translatedRhombus = rhombus + Point(120, 0);
+    translatedTriangle.draw(RED);
+    translatedRhombus.draw(RED);
+    getch();
+
+    Shape scaledTriangle = triangle * 1.5;
+    Shape scaledRhombus = rhombus * 1.5;
+    scaledTriangle.draw(GREEN);
+    scaledRhombus.draw(GREEN);
+    getch();
+
+    Shape rotatedTriangle = triangle.rotate(45, Point(75, 150)); 
+    Shape rotatedRhombus = rhombus.rotate(45, Point(340, 150)); 
+    rotatedTriangle.draw(BLUE);
+    rotatedRhombus.draw(BLUE);
+    getch();
+
+    closegraph();
+    return 0;
+}
